@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "title": "The Pragmatic Programmer",
+    "author": "David Thomas, Andrew Hunt",
+    "price": 42.50,
+    "description": "Your journey to mastery. A classic book for software developers.",
+    "imageUrl": "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1485103833l/40991432.jpg"
+  },
+  {
+    "id": 2,
+    "title": "Clean Code",
+    "author": "Robert C. Martin",
+    "price": 38.00,
+    "description": "A handbook of agile software craftsmanship. Learn to write code that is easy to read and maintain.",
+    "imageUrl": "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1437923081l/3735293.jpg"
+  },
+  {
+    "id": 3,
+    "title": "Design Patterns: Elements of Reusable Object-Oriented Software",
+    "author": "Erich Gamma, et al.",
+    "price": 55.75,
+    "description": "The seminal book on design patterns, a must-read for any serious software engineer.",
+    "imageUrl": "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1435551267l/85009.jpg"
+  },
+  {
+    "id": 4,
+    "title": "The Phoenix Project",
+    "author": "Gene Kim, Kevin Behr, George Spafford",
+    "price": 24.95,
+    "description": "A Novel about IT, DevOps, and Helping Your Business Win. A great story about DevOps transformation.",
+    "imageUrl": "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1362653330l/15832056.jpg"
+  },
+  {
+    "id": 5,
+    "title": "Site Reliability Engineering",
+    "author": "Betsy Beyer, et al.",
+    "price": 48.00,
+    "description": "How Google Runs Production Systems. Learn the principles that enable Google's SREs to run the world's largest software systems.",
+    "imageUrl": "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1449093634l/25673745.jpg"
+  }
+]

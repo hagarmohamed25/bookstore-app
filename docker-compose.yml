@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: bookstore-backend
+    ports:
+      - "5000:5000" # Expose backend on port 5000 for direct access if needed
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: bookstore-frontend
+    ports:
+      - "3000:80" # Map host port 3000 to container port 80 (Nginx)
+    depends_on:
+      - backend # Wait for the backend service to be ready
