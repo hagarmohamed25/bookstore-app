@@ -175,23 +175,27 @@ resource "aws_security_group" "nexus_sg" {
 }
 
 # Create the EC2 instance for Nexus
-resource "aws_instance" "nexus" {
-  ami                    = "ami-0c55b159cbfafe1f0" # Amazon Linux 2 AMI
-  instance_type          = var.instance_type
-  key_name               = var.key_name
-  subnet_id              = aws_subnet.nexus_subnet.id
-  vpc_security_group_ids = [aws_security_group.nexus_sg.id]
+# resource "aws_instance" "nexus" {
+#   ami                    = "ami-068c0051b15cdb816" # Amazon Linux 2023 AMI
+#   instance_type          = var.instance_type
+#   key_name               = var.key_name
+#   subnet_id              = aws_subnet.nexus_subnet.id
+#   vpc_security_group_ids = [aws_security_group.nexus_sg.id]
+#   user_data = <<-EOF
+#               #!/bin/bash
+#               yum update -y
+#               yum install -y docker
+#               service docker start
+#               usermod -a -G docker ec2-user
+#               EOF
+#   tags = {
+#     Name = "nexus-server-v2"
+#   }
+# }
 
-  # User data script to install Docker
-  user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y docker
-              service docker start
-              usermod -a -G docker ec2-user
-              EOF
-
-  tags = {
-    Name = "nexus-server-v2"
+# Temporary resource for testing
+resource "null_resource" "test" {
+  provisioner "local-exec" {
+    command = "echo 'This is a test to prove the new code is running!'"
   }
 }
