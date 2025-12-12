@@ -23,10 +23,10 @@ variable "my_ip" {
   type        = string
 }*/
 
-variable "aws_region" {
-  description = "The AWS region to deploy resources in."
+variable "aws_az" {
+  description = "The availability zone to use."
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-1a" # Change this if your region is not us-east-1
 }
 
 variable "key_name" {

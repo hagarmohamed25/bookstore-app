@@ -117,6 +117,7 @@ resource "aws_subnet" "nexus_subnet" {
   vpc_id                  = aws_vpc.nexus_vpc.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
+  availability_zone       = var.aws_az # <-- THIS IS THE ADDED LINE
   tags = {
     Name = "nexus-subnet"
   }
@@ -155,13 +156,13 @@ resource "aws_security_group" "nexus_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow SSH from anywhere. Restrict this in a real-world scenario.
+    cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
     from_port   = 8081
     to_port     = 8081
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow HTTP access to Nexus UI from anywhere.
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     from_port   = 0
@@ -181,6 +182,8 @@ resource "aws_instance" "nexus" {
   key_name               = var.key_name
   subnet_id              = aws_subnet.nexus_subnet.id
   vpc_security_group_ids = [aws_security_group.nexus_sg.id]
+
+  # User data script to install Docker
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
@@ -188,6 +191,7 @@ resource "aws_instance" "nexus" {
               service docker start
               usermod -a -G docker ec2-user
               EOF
+
   tags = {
     Name = "nexus-server-v2"
   }
