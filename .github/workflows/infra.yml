@@ -1,0 +1,72 @@
+name: Infrastructure Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose an action'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+        - apply
+        - destroy
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        if: github.event.inputs.action == 'apply'
+        run: terraform apply -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Terraform Destroy
+        if: github.event.inputs.action == 'destroy'
+        run: terraform destroy -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Get Nexus IP
+        if: github.event.inputs.action == 'apply'
+        id: nexus
+        run: echo "public_ip=$(terraform output -raw nexus_public_ip)" >> $GITHUB_OUTPUT
+
+      - name: Set up Python
+        if: github.event.inputs.action == 'apply'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Ansible dependencies
+        if: github.event.inputs.action == 'apply'
+        run: pip install -r ../ansible/requirements.txt
+
+      - name: Write SSH key to file
+        if: github.event.inputs.action == 'apply'
+        run: echo "${{ secrets.NEXUS_KEY_PEM }}" > nexus-key.pem && chmod 400 nexus-key.pem
+
+      - name: Run Ansible playbook
+        if: github.event.inputs.action == 'apply'
+        run: ansible-playbook -i ../ansible/inventory.yml --private-key nexus-key.pem -u ec2-user ../ansible/playbook.yml
+        env:
+          NEXUS_ADMIN_PASSWORD: ${{ secrets.NEXUS_ADMIN_PASSWORD }}
+          NEXUS_CI_USER_PASSWORD: ${{ secrets.NEXUS_CI_USER_PASSWORD }}
