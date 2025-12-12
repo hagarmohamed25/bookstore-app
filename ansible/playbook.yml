@@ -1,0 +1,156 @@
+/*
+# ansible/playbook.yml
+
+---
+- name: Configure Nexus Repository Manager
+  hosts: nexus_server
+  become: yes
+  vars:
+    nexus_base_url: "http://{{ ansible_host }}:8081"
+    nexus_admin_new_password: "YourNewStrongPassword123!" # IMPORTANT: Change this!
+
+  tasks:
+    - name: Wait for Nexus to fully start up
+      uri:
+        url: "{{ nexus_base_url }}"
+        method: GET
+        status_code: 200
+      register: nexus_status
+      until: nexus_status.status == 200
+      retries: 30
+      delay: 10
+
+    - name: Get the default admin password from the container
+      command: "docker exec nexus cat /nexus-data/admin.password"
+      register: nexus_default_password
+      changed_when: false
+
+    - name: Change the default admin password
+      uri:
+        url: "{{ nexus_base_url }}/service/rest/v1/security/users/admin/change-password"
+        method: PUT
+        user: "admin"
+        password: "{{ nexus_default_password.stdout }}"
+        body: "{{ nexus_admin_new_password }}"
+        body_format: json
+        headers:
+          Content-Type: "text/plain"
+        status_code: 204
+      register: password_change_result
+
+    - name: Create the Docker hosted repository
+      uri:
+        url: "{{ nexus_base_url }}/service/rest/v1/repositories/docker/hosted"
+        method: POST
+        user: "admin"
+        password: "{{ nexus_admin_new_password }}"
+        body:
+          name: "docker-hosted"
+          online: true
+          storage:
+            blobStoreName: "default"
+            strictContentTypeValidation: true
+          docker:
+            v1Enabled: false
+            forceBasicAuth: false
+            httpPort: 8081
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        status_code: 201
+      register: repo_creation_result
+
+    - name: Display the final repository URL
+      debug:
+        msg: "Docker Hosted Repository URL is: {{ nexus_base_url }}/repository/docker-hosted/" 
+        */
+
+        ---
+- hosts: nexus_server
+  become: yes
+  vars:
+    nexus_container_name: nexus
+    nexus_docker_image: sonatype/nexus3
+    nexus_port: 8081
+    nexus_data_dir: /nexus-data
+    nexus_admin_password_file: "{{ nexus_data_dir }}/admin.password"
+    nexus_repo_name: docker-hosted
+    nexus_ci_user: github-user
+    nexus_ci_user_password: "{{ lookup('env', 'NEXUS_CI_USER_PASSWORD') }}"
+    nexus_new_admin_password: "{{ lookup('env', 'NEXUS_ADMIN_PASSWORD') }}"
+
+  tasks:
+    - name: Create a directory for Nexus data
+      file:
+        path: "{{ nexus_data_dir }}"
+        state: directory
+        mode: '0777'
+
+    - name: Run Nexus Docker container
+      docker_container:
+        name: "{{ nexus_container_name }}"
+        image: "{{ nexus_docker_image }}"
+        state: started
+        ports:
+          - "{{ nexus_port }}:8081"
+        volumes:
+          - "{{ nexus_data_dir }}:/nexus-data"
+        restart_policy: always
+
+    - name: Wait for Nexus to start
+      uri:
+        url: "http://localhost:{{ nexus_port }}"
+        method: GET
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 60
+      delay: 10
+
+    - name: Read the default admin password
+      slurp:
+        src: "{{ nexus_admin_password_file }}"
+      register: default_admin_password
+
+    - name: Decode the default admin password
+      set_fact:
+        nexus_default_password: "{{ default_admin_password.content | b64decode }}"
+
+    - name: Change the default admin password
+      uri:
+        url: "http://localhost:{{ nexus_port }}/service/rest/v1/security/users/admin/change-password"
+        method: PUT
+        user: "admin"
+        password: "{{ nexus_default_password }}"
+        body: '{"userId":"admin","newPassword":"{{ nexus_new_admin_password }}"}'
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        status_code: 204
+      register: password_change_result
+
+    - name: Create a new CI/CD user
+      uri:
+        url: "http://localhost:{{ nexus_port }}/service/rest/v1/security/users"
+        method: POST
+        user: "admin"
+        password: "{{ nexus_new_admin_password }}"
+        body: '{"userId":"{{ nexus_ci_user }}","firstName":"CI","lastName":"User","emailAddress":"ci@example.com","password":"{{ nexus_ci_user_password }}","status":"active","roles":["nx-admin"]}'
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        status_code: 200
+      register: user_creation_result
+
+    - name: Create a Docker hosted repository
+      uri:
+        url: "http://localhost:{{ nexus_port }}/service/rest/v1/repositories/docker/hosted"
+        method: POST
+        user: "admin"
+        password: "{{ nexus_new_admin_password }}"
+        body: '{"name":"{{ nexus_repo_name }}","online":true,"storage":{"blobStoreName":"default","strictContentTypeValidation":true,"writePolicy":"allow_once"},"docker":{"v1Enabled":false,"forceBasicAuth":true,"httpPort":8082},"component":{"proprietaryComponents":true}}'
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        status_code: 201
+      register: repo_creation_result

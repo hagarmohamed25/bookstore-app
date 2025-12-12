@@ -1,0 +1,102 @@
+{
+    "NetworkInterfaces": [
+        {
+            "Attachment": {
+                "AttachTime": "2025-12-08T23:57:25+00:00",
+                "AttachmentId": "eni-attach-01f62b5cf7fb68e8e",
+                "DeleteOnTermination": true,
+                "DeviceIndex": 1,
+                "NetworkCardIndex": 0,
+                "InstanceOwnerId": "372095247999",
+                "Status": "attached"
+            },
+            "AvailabilityZone": "us-east-1a",
+            "Description": "Amazon EKS bookstore-cluster",
+            "Groups": [
+                {
+                    "GroupId": "sg-0d1155cc23b6e597d",
+                    "GroupName": "eks-cluster-sg-bookstore-cluster-68877115"
+                },
+                {
+                    "GroupId": "sg-06c3d9b9b771ccb7e",
+                    "GroupName": "bookstore-cluster-cluster-2025120823472229950000000a"
+                }
+            ],
+            "InterfaceType": "interface",
+            "Ipv6Addresses": [],
+            "MacAddress": "0a:ff:dc:ab:a3:a5",
+            "NetworkInterfaceId": "eni-0636d97a780cc77d0",
+            "OwnerId": "620369151876",
+            "PrivateDnsName": "ip-10-0-1-117.ec2.internal",
+            "PublicDnsName": "",
+            "PrivateIpAddress": "10.0.1.117",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateDnsName": "ip-10-0-1-117.ec2.internal",
+                    "PrivateIpAddress": "10.0.1.117"
+                }
+            ],
+            "RequesterId": "372095247999",
+            "RequesterManaged": true,
+            "SourceDestCheck": true,
+            "Status": "in-use",
+            "SubnetId": "subnet-03d6759ba0900ecb6",
+            "TagSet": [],
+            "VpcId": "vpc-02c5ae2eecbd7b03b",
+            "Operator": {
+                "Managed": false
+            },
+            "AvailabilityZoneId": "use1-az4"
+        },
+        {
+            "Attachment": {
+                "AttachTime": "2025-12-08T23:50:41+00:00",
+                "AttachmentId": "eni-attach-0538723c709cee1f1",
+                "DeleteOnTermination": true,
+                "DeviceIndex": 1,
+                "NetworkCardIndex": 0,
+                "InstanceOwnerId": "372095247999",
+                "Status": "attached"
+            },
+            "AvailabilityZone": "us-east-1b",
+            "Description": "Amazon EKS bookstore-cluster",
+            "Groups": [
+                {
+                    "GroupId": "sg-0d1155cc23b6e597d",
+                    "GroupName": "eks-cluster-sg-bookstore-cluster-68877115"
+                },
+                {
+                    "GroupId": "sg-06c3d9b9b771ccb7e",
+                    "GroupName": "bookstore-cluster-cluster-2025120823472229950000000a"
+                }
+            ],
+            "InterfaceType": "interface",
+            "Ipv6Addresses": [],
+            "MacAddress": "0e:bf:cc:46:fb:f3",
+            "NetworkInterfaceId": "eni-02d2ad4dc30e9917e",
+            "OwnerId": "620369151876",
+            "PrivateDnsName": "ip-10-0-2-103.ec2.internal",
+            "PublicDnsName": "",
+            "PrivateIpAddress": "10.0.2.103",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateDnsName": "ip-10-0-2-103.ec2.internal",
+                    "PrivateIpAddress": "10.0.2.103"
+                }
+            ],
+            "RequesterId": "372095247999",
+            "RequesterManaged": true,
+            "SourceDestCheck": true,
+            "Status": "in-use",
+            "SubnetId": "subnet-0c71b0f6970e4c3eb",
+            "TagSet": [],
+            "VpcId": "vpc-02c5ae2eecbd7b03b",
+            "Operator": {
+                "Managed": false
+            },
+            "AvailabilityZoneId": "use1-az6"
+        }
+    ]
+}
