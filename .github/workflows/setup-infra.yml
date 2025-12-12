@@ -43,7 +43,7 @@ jobs:
         run: echo "${{ secrets.NEXUS_KEY_PEM }}" > nexus-key.pem && chmod 400 nexus-key.pem
 
       - name: Run Ansible playbook
-        run: ansible-playbook -i "${{ steps.nexus.outputs.public_ip } ," --private-key nexus-key.pem -u ec2-user ../ansible/playbook.yml
+        run: ansible-playbook -i "${{ steps.nexus.outputs.public_ip }}," --private-key nexus-key.pem -u ec2-user ../ansible/playbook.yml
         env:
           NEXUS_ADMIN_PASSWORD: ${{ secrets.NEXUS_ADMIN_PASSWORD }}
           NEXUS_CI_USER_PASSWORD: ${{ secrets.NEXUS_CI_USER_PASSWORD }}
