@@ -66,7 +66,7 @@ jobs:
 
       - name: Run Ansible playbook
         if: github.event.inputs.action == 'apply'
-        run: ansible-playbook -i ../ansible/inventory.yml --private-key nexus-key.pem -u ec2-user -o StrictHostKeyChecking=no ../ansible/playbook.yml
+        run: ansible-playbook -i ../ansible/inventory.yml --private-key nexus-key.pem -u ec2-user --ssh-common-args='-o StrictHostKeyChecking=no' ../ansible/playbook.yml
         env:
           NEXUS_ADMIN_PASSWORD: ${{ secrets.NEXUS_ADMIN_PASSWORD }}
           NEXUS_CI_USER_PASSWORD: ${{ secrets.NEXUS_CI_USER_PASSWORD }}
