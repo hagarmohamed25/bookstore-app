@@ -65,7 +65,7 @@
         msg: "Docker Hosted Repository URL is: {{ nexus_base_url }}/repository/docker-hosted/" 
         */
 
-        ---
+---
 - hosts: nexus_server
   become: yes
   vars:
@@ -127,7 +127,6 @@
         headers:
           Content-Type: "application/json"
         status_code: 204
-      register: password_change_result
 
     - name: Create a new CI/CD user
       uri:
@@ -140,7 +139,6 @@
         headers:
           Content-Type: "application/json"
         status_code: 200
-      register: user_creation_result
 
     - name: Create a Docker hosted repository
       uri:
@@ -153,4 +151,3 @@
         headers:
           Content-Type: "application/json"
         status_code: 201
-      register: repo_creation_result
