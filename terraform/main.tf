@@ -192,6 +192,6 @@ resource "aws_instance" "nexus" {
               EOF
 
   tags = {
-    Name = "nexus-server"
+    Name = "nexus-server-v2"
   }
 }
