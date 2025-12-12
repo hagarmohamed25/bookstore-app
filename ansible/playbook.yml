@@ -52,15 +52,19 @@
           - "{{ nexus_data_dir }}:/nexus-data"
         restart_policy: always
 
-    - name: Wait for Nexus to start
+        - name: Wait for Nexus to start
       uri:
         url: "http://localhost:{{ nexus_port }}"
         method: GET
         status_code: 200
       register: result
       until: result.status == 200
-      retries: 60
-      delay: 10
+      retries: 20 # Increased from 60
+      delay: 30  # Increased from 10 to 30 seconds
+
+    - name: Get Nexus logs on failure
+      when: result is failed
+      command: docker logs nexus
 
     - name: Read the default admin password
       slurp:
