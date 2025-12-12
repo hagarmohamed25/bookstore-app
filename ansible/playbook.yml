@@ -13,6 +13,24 @@
     nexus_new_admin_password: "{{ lookup('env', 'NEXUS_ADMIN_PASSWORD') }}"
 
   tasks:
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create a directory for Nexus data
+      file:
+        path: "{{ nexus_data_dir }}"
+        state: directory
+        mode: '0777'
+
+    # ... the rest of your tasks ...
     - name: Create a directory for Nexus data
       file:
         path: "{{ nexus_data_dir }}"
