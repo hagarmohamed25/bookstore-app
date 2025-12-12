@@ -37,13 +37,10 @@ jobs:
           python-version: '3.9'
 
       - name: Install Ansible dependencies
-        run: |
-          pip install -r ../ansible/requirements.txt
+        run: pip install -r ../ansible/requirements.txt
 
       - name: Write SSH key to file
-        run: |
-          echo "${{ secrets.NEXUS_KEY_PEM }}" > nexus-key.pem
-          chmod 400 nexus-key.pem
+        run: echo "${{ secrets.NEXUS_KEY_PEM }}" > nexus-key.pem && chmod 400 nexus-key.pem
 
       - name: Run Ansible playbook
         run: ansible-playbook -i "${{ steps.nexus.outputs.public_ip }," --private-key nexus-key.pem -u ec2-user ../ansible/playbook.yml
