@@ -182,6 +182,7 @@ resource "aws_instance" "nexus" {
   key_name               = var.key_name
   subnet_id              = aws_subnet.nexus_subnet.id
   vpc_security_group_ids = [aws_security_group.nexus_sg.id]
+  
 
   # User data script to install Docker
   user_data = <<-EOF
@@ -195,4 +196,13 @@ resource "aws_instance" "nexus" {
   tags = {
     Name = "nexus-server-v2"
   }
+}
+
+# Create an Ansible inventory file
+resource "local_file" "ansible_inventory" {
+  content = <<-EOF
+    [nexus_server]
+    ${aws_instance.nexus.public_ip}
+  EOF
+  filename = "${path.module}/../ansible/inventory.yml"
 }
