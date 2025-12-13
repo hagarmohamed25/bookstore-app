@@ -46,3 +46,9 @@ variable "aws_az" {
   type        = string
   default     = "us-east-1a"
 }
+
+variable "your_ip" {
+  description = "Your public IP address for SSH and Nexus access."
+  type        = string
+  default     = "156.223.75.140" # <-- REPLACE WITH YOUR IP
+}

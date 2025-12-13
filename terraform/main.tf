@@ -152,24 +152,38 @@ resource "aws_route_table_association" "nexus_rta" {
 # Create a security group to allow traffic to Nexus
 resource "aws_security_group" "nexus_sg" {
   vpc_id = aws_vpc.nexus_vpc.id
+
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    # Secure: Only allows access from your IP
+    cidr_blocks = ["${var.your_ip}/32"]
   }
+
   ingress {
     from_port   = 8081
     to_port     = 8081
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    # Secure: Only allows access from your IP
+    cidr_blocks = ["${var.your_ip}/32"]
   }
+
+  ingress {
+    from_port   = 8443
+    to_port     = 8443
+    protocol    = "tcp"
+    # You can decide if this should be open to everyone or just you
+    cidr_blocks = ["0.0.0.0/0"] # Or use ["${var.your_ip}/32"] for more security
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   tags = {
     Name = "nexus-sg"
   }
