@@ -8,7 +8,6 @@
     nexus_data_dir: /nexus-data
     nexus_repo_name: docker-hosted
     nexus_ci_user: github-user
-    # CORRECTED: The lookup function now uses double quotes.
     nexus_ci_user_password: "{{ lookup('env', 'NEXUS_CI_USER_PASSWORD') }}"
     nexus_new_admin_password: "{{ lookup('env', 'NEXUS_ADMIN_PASSWORD') }}"
 
@@ -29,20 +28,13 @@
         enabled: yes
 
     - name: Create a directory for Nexus data
-      file:
-        path: "{{ nexus_data_dir }}"
-        state: directory
-        mode: '0777'
-
-    # ... the rest of your tasks ...
-    - name: Create a directory for Nexus data
-      file:
+      ansible.builtin.file:
         path: "{{ nexus_data_dir }}"
         state: directory
         mode: '0777'
 
     - name: Run Nexus Docker container
-      docker_container:
+      community.docker.docker_container:
         name: "{{ nexus_container_name }}"
         image: "{{ nexus_docker_image }}"
         state: started
@@ -52,31 +44,31 @@
           - "{{ nexus_data_dir }}:/nexus-data"
         restart_policy: always
 
-        - name: Wait for Nexus to start
-      uri:
+    - name: Wait for Nexus to start
+      ansible.builtin.uri:
         url: "http://localhost:{{ nexus_port }}"
         method: GET
         status_code: 200
       register: result
       until: result.status == 200
-      retries: 20 # Increased from 60
-      delay: 30  # Increased from 10 to 30 seconds
+      retries: 20
+      delay: 30
 
     - name: Get Nexus logs on failure
       when: result is failed
-      command: docker logs nexus
+      ansible.builtin.command: docker logs nexus
 
     - name: Read the default admin password
-      slurp:
+      ansible.builtin.slurp:
         src: "{{ nexus_data_dir }}/admin.password"
       register: default_admin_password
 
     - name: Decode the default admin password
-      set_fact:
+      ansible.builtin.set_fact:
         nexus_default_password: "{{ default_admin_password.content | b64decode }}"
 
     - name: Change the default admin password
-      uri:
+      ansible.builtin.uri:
         url: "http://localhost:{{ nexus_port }}/service/rest/v1/security/users/admin/change-password"
         method: PUT
         user: "admin"
@@ -92,7 +84,7 @@
         status_code: 204
 
     - name: Create a new CI/CD user
-      uri:
+      ansible.builtin.uri:
         url: "http://localhost:{{ nexus_port }}/service/rest/v1/security/users"
         method: POST
         user: "admin"
@@ -113,7 +105,7 @@
         status_code: 200
 
     - name: Create a Docker hosted repository
-      uri:
+      ansible.builtin.uri:
         url: "http://localhost:{{ nexus_port }}/service/rest/v1/repositories/docker/hosted"
         method: POST
         user: "admin"
